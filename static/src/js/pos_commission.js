@@ -8,8 +8,6 @@ import { Dialog } from "@web/core/dialog/dialog";
 import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_validation";
 import { makeAwaitable } from "@point_of_sale/app/utils/make_awaitable_dialog";
 
-console.log("POS Commission: Loading...");
-
 export class CommissionWorkerPopup extends Component {
     static template = "pos_sales_commission.CommissionWorkerPopup";
     static components = { Dialog };
@@ -21,7 +19,6 @@ export class CommissionWorkerPopup extends Component {
     };
 
     setup() {
-        console.log("CommissionWorkerPopup: setup called");
         const initialAssignments = {};
         for (const line of this.props.order.lines) {
             initialAssignments[line.uuid] = line.commission_employee_id || null;
@@ -29,24 +26,20 @@ export class CommissionWorkerPopup extends Component {
         this.state = useState({
             lineEmployees: initialAssignments
         });
-        console.log("CommissionWorkerPopup: initialAssignments", initialAssignments);
     }
 
     onSelectEmployee(ev) {
         const lineUuid = ev.target.dataset.lineUuid;
         const employeeId = ev.target.value ? parseInt(ev.target.value) : null;
-        console.log("onSelectEmployee: lineUuid=", lineUuid, "employeeId=", employeeId);
         this.state.lineEmployees[lineUuid] = employeeId;
     }
 
     onConfirm() {
-        console.log("onConfirm called", this.state.lineEmployees);
         this.props.getPayload(this.state.lineEmployees);
         this.props.close();
     }
 
     onCancel() {
-        console.log("onCancel called");
         this.props.getPayload(null);
         this.props.close();
     }
@@ -90,8 +83,6 @@ patch(PosOrder.prototype, {
 
 patch(OrderPaymentValidation.prototype, {
     async askBeforeValidation() {
-        console.log("=== askBeforeValidation called ===");
-        
         const result = await super.askBeforeValidation(...arguments);
         
         if (result === false) {
@@ -99,7 +90,6 @@ patch(OrderPaymentValidation.prototype, {
         }
         
         if (!this.pos.config.commission_enabled) {
-            console.log("commission not enabled, returning true");
             return true;
         }
         
@@ -110,7 +100,6 @@ patch(OrderPaymentValidation.prototype, {
         }
         
         const employees = this.pos.models["hr.employee"].getAll();
-        console.log("employees found:", employees?.length);
         
         if (!employees || employees.length === 0) {
             return true;
@@ -120,8 +109,6 @@ patch(OrderPaymentValidation.prototype, {
             order: order,
             employees: employees,
         });
-        
-        console.log("popup result:", popupResult);
         
         if (popupResult === null || popupResult === undefined) {
             return false;
@@ -137,5 +124,3 @@ patch(OrderPaymentValidation.prototype, {
         return true;
     },
 });
-
-console.log("POS Commission: Loaded");

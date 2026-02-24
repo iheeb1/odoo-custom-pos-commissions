@@ -86,22 +86,28 @@ class PosCommissionLine(models.Model):
 
     state = fields.Selection(
         [
-            ("draft", "Draft"),
             ("posted", "Posted"),
             ("paid", "Paid"),
+            ("cancelled", "Cancelled"),
         ],
         string="Status",
-        default="draft",
+        default="posted",
         required=True,
         index=True,
+    )
+
+    payment_move_id = fields.Many2one(
+        "account.move", string="Payment Entry", readonly=True
     )
 
     journal_entry_id = fields.Many2one(
         "account.move.line", string="Journal Entry Line", readonly=True
     )
 
-    payment_move_id = fields.Many2one(
-        "account.move", string="Payment Entry", readonly=True
+    move_id = fields.Many2one("account.move", string="Journal Entry", readonly=True)
+
+    cancel_move_id = fields.Many2one(
+        "account.move", string="Cancellation Entry", readonly=True
     )
 
     date = fields.Date(string="Date", required=True, default=fields.Date.context_today)
@@ -116,23 +122,78 @@ class PosCommissionLine(models.Model):
 
     note = fields.Text(string="Notes")
 
-    def action_post(self):
+    def action_cancel(self):
         for line in self:
-            if line.state != "draft":
+            if line.state != "posted":
                 continue
-            line.write({"state": "posted"})
+            if line.cancel_move_id:
+                continue
+
+            if not line.move_id:
+                line.write({"state": "cancelled"})
+                continue
+
+            cancel_move = self.env["account.move"].create(
+                {
+                    "journal_id": line.journal_id.id,
+                    "date": fields.Date.today(),
+                    "ref": _("Commission Cancellation: %s") % line.name,
+                    "line_ids": [
+                        (
+                            0,
+                            0,
+                            {
+                                "name": _("Cancellation: %s")
+                                % line.move_id.line_ids[0].name,
+                                "account_id": line.move_id.line_ids[0].account_id.id,
+                                "debit": line.move_id.line_ids[0].credit,
+                                "credit": line.move_id.line_ids[0].debit,
+                                "partner_id": line.move_id.line_ids[0].partner_id.id,
+                            },
+                        ),
+                        (
+                            0,
+                            0,
+                            {
+                                "name": _("Cancellation: %s")
+                                % line.move_id.line_ids[1].name
+                                if len(line.move_id.line_ids) > 1
+                                else _("Cancellation"),
+                                "account_id": line.move_id.line_ids[1].account_id.id
+                                if len(line.move_id.line_ids) > 1
+                                else line.journal_id.default_account_id.id,
+                                "debit": line.move_id.line_ids[1].credit
+                                if len(line.move_id.line_ids) > 1
+                                else line.commission_amount,
+                                "credit": line.move_id.line_ids[1].debit
+                                if len(line.move_id.line_ids) > 1
+                                else 0.0,
+                                "partner_id": line.move_id.line_ids[1].partner_id.id
+                                if len(line.move_id.line_ids) > 1
+                                else False,
+                            },
+                        ),
+                    ],
+                }
+            )
+            cancel_move.action_post()
+
+            line.write(
+                {
+                    "state": "cancelled",
+                    "cancel_move_id": cancel_move.id,
+                }
+            )
+
         return True
 
-    def action_set_to_draft(self):
-        for line in self:
-            if line.state == "posted" and not line.payment_move_id:
-                line.write({"state": "draft"})
-        return True
-
-    def action_mark_paid(self, payment_move_id=None):
-        for line in self:
-            if line.state == "posted":
-                line.write({"state": "paid", "payment_move_id": payment_move_id})
+    def action_mark_paid(self, payment_move_id):
+        self.write(
+            {
+                "state": "paid",
+                "payment_move_id": payment_move_id,
+            }
+        )
         return True
 
     @api.model
@@ -190,7 +251,7 @@ class PosCommissionLine(models.Model):
                 [
                     ("employee_id", "=", employee.id),
                     ("rule_id", "=", rule.id),
-                    ("state", "!=", "cancel"),
+                    ("state", "=", "posted"),
                 ]
             )
             if previous_commissions:
@@ -220,6 +281,7 @@ class PosCommissionLine(models.Model):
                     "date": order.date_order.date(),
                     "qty": order_line.qty,
                     "cumulative_qty": cumulative_qty_before,
+                    "state": "posted",
                 }
             )
 
@@ -310,8 +372,8 @@ class PosCommissionLine(models.Model):
 
         commission_lines.write(
             {
-                "state": "posted",
                 "journal_entry_id": move.line_ids[0].id,
+                "move_id": move.id,
                 "journal_id": journal.id,
             }
         )

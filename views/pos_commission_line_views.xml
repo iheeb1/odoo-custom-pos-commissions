@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Commission Line List View -->
+        <record id="view_pos_commission_line_tree" model="ir.ui.view">
+            <field name="name">pos.commission.line.list</field>
+            <field name="model">pos.commission.line</field>
+            <field name="arch" type="xml">
+                <list string="Commission Lines" decoration-success="state == 'paid'" decoration-warning="state == 'posted'">
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="pos_config_id" optional="show"/>
+                    <field name="employee_id"/>
+                    <field name="order_id"/>
+                    <field name="product_id"/>
+                    <field name="qty"/>
+                    <field name="cumulative_qty" optional="show"/>
+                    <field name="base_amount"/>
+                    <field name="commission_type"/>
+                    <field name="rate"/>
+                    <field name="commission_amount" sum="Total"/>
+                    <field name="journal_id" optional="show"/>
+                    <field name="state" widget="badge" decoration-success="state == 'paid'" decoration-warning="state == 'posted'" decoration-muted="state == 'draft'"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Commission Line Form View -->
+        <record id="view_pos_commission_line_form" model="ir.ui.view">
+            <field name="name">pos.commission.line.form</field>
+            <field name="model">pos.commission.line</field>
+            <field name="arch" type="xml">
+                <form string="Commission Line">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="pos_config_id"/>
+                                <field name="employee_id"/>
+                                <field name="order_id"/>
+                                <field name="order_line_id"/>
+                                <field name="product_id"/>
+                                <field name="qty"/>
+                            </group>
+                            <group>
+                                <field name="date"/>
+                                <field name="rule_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <group string="Commission Calculation">
+                            <group>
+                                <field name="base_amount"/>
+                                <field name="commission_type"/>
+                    <field name="rate" optional="show"/>
+                            </group>
+                            <group>
+                                <field name="commission_amount"/>
+                            </group>
+                        </group>
+                        <group string="Accounting">
+                            <group>
+                                <field name="journal_id"/>
+                                <field name="journal_entry_id"/>
+                                <field name="payment_move_id"/>
+                            </group>
+                        </group>
+                        <field name="note" placeholder="Notes..."/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Commission Line Search View -->
+        <record id="view_pos_commission_line_search" model="ir.ui.view">
+            <field name="name">pos.commission.line.search</field>
+            <field name="model">pos.commission.line</field>
+            <field name="arch" type="xml">
+                <search string="Search Commission Lines">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="order_id"/>
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Posted" name="posted" domain="[('state', '=', 'posted')]"/>
+                    <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Commission Line Action -->
+        <record id="action_pos_commission_line" model="ir.actions.act_window">
+            <field name="name">Commission Lines</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pos.commission.line</field>
+            <field name="view_mode">list,form,pivot,graph</field>
+            <field name="search_view_id" ref="view_pos_commission_line_search"/>
+            <field name="context">{'search_default_posted': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No commission lines found
+                </p>
+                <p>
+                    Commission lines are created automatically when POS orders are paid.
+                </p>
+            </field>
+        </record>
+
+        <!-- Commission Lines Menu -->
+        <menuitem id="menu_pos_commission_line"
+                  name="Commission Lines"
+                  parent="menu_pos_commission_root"
+                  action="action_pos_commission_line"
+                  sequence="20"/>
+
+        <!-- Pivot View for Reporting -->
+        <record id="view_pos_commission_line_pivot" model="ir.ui.view">
+            <field name="name">pos.commission.line.pivot</field>
+            <field name="model">pos.commission.line</field>
+            <field name="arch" type="xml">
+                <pivot string="Commission Analysis">
+                    <field name="pos_config_id" type="row"/>
+                    <field name="employee_id" type="row"/>
+                    <field name="date" interval="month" type="col"/>
+                    <field name="commission_amount" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- Graph View for Reporting -->
+        <record id="view_pos_commission_line_graph" model="ir.ui.view">
+            <field name="name">pos.commission.line.graph</field>
+            <field name="model">pos.commission.line</field>
+            <field name="arch" type="xml">
+                <graph string="Commission Analysis" type="bar">
+                    <field name="pos_config_id" type="row"/>
+                    <field name="employee_id" type="row"/>
+                    <field name="commission_amount" type="measure"/>
+                </graph>
+            </field>
+        </record>
+    </data>
+</odoo>

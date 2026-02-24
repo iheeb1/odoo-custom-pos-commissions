@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Extend POS Order Form -->
+        <record id="view_pos_order_form_commission" model="ir.ui.view">
+            <field name="name">pos.order.form.commission</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_ids']" position="before">
+                    <field name="employee_id" />
+                </xpath>
+                <xpath expr="//field[@name='payment_ids']" position="after">
+                    <group string="Commissions" invisible="not commission_line_ids">
+                        <field name="commission_total" widget="monetary"/>
+                        <field name="commission_move_id"/>
+                    </group>
+                    <field name="commission_line_ids" invisible="not commission_line_ids">
+                        <list create="false" delete="false">
+                            <field name="employee_id"/>
+                            <field name="product_id"/>
+                            <field name="qty"/>
+                            <field name="base_amount"/>
+                            <field name="commission_type"/>
+                            <field name="rate"/>
+                            <field name="commission_amount"/>
+                            <field name="state"/>
+                        </list>
+                    </field>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Extend POS Order List -->
+        <record id="view_pos_order_tree_commission" model="ir.ui.view">
+            <field name="name">pos.order.list.commission</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="amount_total" position="after">
+                    <field name="commission_total" sum="Total Commission"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

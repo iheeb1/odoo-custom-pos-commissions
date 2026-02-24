@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="pos_sales_commission.CommissionWorkerPopup" owl="1">
+        <Dialog title="'Select Commission Workers'" footer="false" size="'lg'">
+            <div class="commission-worker-popup p-3">
+                <div class="alert alert-info mb-3">
+                    <i class="fa fa-info-circle me-2"/>
+                    Select the worker for each order line who will receive the commission.
+                </div>
+                
+                <div class="orderlines-container mb-3">
+                    <t t-foreach="props.order.lines" t-as="line" t-key="line.uuid">
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 border rounded bg-light">
+                            <div class="d-flex flex-column flex-grow-1 me-3">
+                                <strong t-esc="line.product_id.name" class="text-dark"/>
+                                <small class="text-muted">
+                                    Qty: <t t-esc="line.qty"/> | 
+                                    <t t-esc="env.utils.formatCurrency(line.price_subtotal)"/>
+                                </small>
+                            </div>
+                            
+                            <select class="form-select w-auto" 
+                                    t-att-data-line-uuid="line.uuid"
+                                    t-on-change="onSelectEmployee">
+                                <option value="" t-att-selected="state.lineEmployees[line.uuid] === null">
+                                    Session Cashier (default)
+                                </option>
+                                <t t-foreach="props.employees" t-as="emp" t-key="emp.id">
+                                    <option t-att-value="emp.id"
+                                            t-att-selected="state.lineEmployees[line.uuid] === emp.id">
+                                        <t t-esc="emp.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                    </t>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <button class="btn btn-secondary px-4" t-on-click="onCancel">
+                        <i class="fa fa-times me-2"/>
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary px-4" t-on-click="onConfirm">
+                        <i class="fa fa-check me-2"/>
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </Dialog>
+    </t>
+
+</templates>

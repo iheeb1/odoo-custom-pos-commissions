@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Extend Product Form -->
+        <record id="product_normal_form_view_commission" model="ir.ui.view">
+            <field name="name">product.product.form.commission</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='sales']" position="inside">
+                    <group string="Commission Override" groups="point_of_sale.group_pos_user">
+                        <field name="commission_override_type"/>
+                        <field name="commission_override_rate" invisible="commission_override_type == 'none'"/>
+                        <field name="commission_rule_id"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Extend Product Category Form -->
+        <record id="product_category_form_view_commission" model="ir.ui.view">
+            <field name="name">product.category.form.commission</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='first']" position="after">
+                    <group name="commission" string="Commission Settings" groups="point_of_sale.group_pos_user">
+                        <field name="commission_override_type"/>
+                        <field name="commission_override_rate" invisible="commission_override_type == 'none'"/>
+                        <field name="commission_rule_id"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

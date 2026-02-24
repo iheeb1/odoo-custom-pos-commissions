@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Extend POS Settings -->
+        <record id="res_config_settings_view_form_commission" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.commission</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@id='pos_accounting_section']" position="after">
+                    <block title="Commissions" id="pos_commission_section">
+                        <setting id="commission_enabled_setting" string="Sales Commissions" help="Track and calculate commissions for workers">
+                            <field name="pos_commission_enabled"/>
+                            <div class="content-group mt16" invisible="not pos_commission_enabled">
+                                <div class="row mt16">
+                                    <label string="Commission Journal" for="pos_commission_journal_id" class="col-lg-3"/>
+                                    <field name="pos_commission_journal_id"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="Expense Account" for="pos_commission_expense_account_id" class="col-lg-3"/>
+                                    <field name="pos_commission_expense_account_id"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="Liability Account" for="pos_commission_liability_account_id" class="col-lg-3"/>
+                                    <field name="pos_commission_liability_account_id"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="Calculation Base" for="pos_commission_calc_base" class="col-lg-3"/>
+                                    <field name="pos_commission_calc_base"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="Default Rule" for="pos_default_commission_rule_id" class="col-lg-3"/>
+                                    <field name="pos_default_commission_rule_id"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

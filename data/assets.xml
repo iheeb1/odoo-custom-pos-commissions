@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pos_commission_js" model="ir.asset">
+        <field name="name">pos_commission.js</field>
+        <field name="bundle">point_of_sale._assets_pos</field>
+        <field name="path">pos_sales_commission/static/src/js/pos_commission.js</field>
+    </record>
+    <record id="pos_commission_xml" model="ir.asset">
+        <field name="name">pos_commission.xml</field>
+        <field name="bundle">point_of_sale._assets_pos</field>
+        <field name="path">pos_sales_commission/static/src/xml/pos_commission.xml</field>
+    </record>
+</odoo>

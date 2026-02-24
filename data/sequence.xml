@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Commission Line Sequence -->
+        <record id="seq_pos_commission_line" model="ir.sequence">
+            <field name="name">POS Commission Line</field>
+            <field name="code">pos.commission.line</field>
+            <field name="prefix">COM</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

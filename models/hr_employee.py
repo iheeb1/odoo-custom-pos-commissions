@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class HrEmployee(models.Model):
-    _inherit = "hr.employee"
+    _name = "hr.employee"
+    _inherit = ["hr.employee", "pos.load.mixin"]
 
     commission_enabled = fields.Boolean(
         string="Eligible for Commission",
@@ -52,8 +53,10 @@ class HrEmployee(models.Model):
                 )
             )
 
-    def _load_pos_data_fields(self, config):
+    @api.model
+    def _load_pos_data_fields(self, config_id):
         return ["id", "name", "work_email", "commission_enabled"]
 
-    def _load_pos_data_domain(self, data, config):
-        return [("company_id", "=", config.company_id.id)]
+    @api.model
+    def _load_pos_data_domain(self, data, config_id):
+        return [("company_id", "in", [False, data.get("company_id")])]

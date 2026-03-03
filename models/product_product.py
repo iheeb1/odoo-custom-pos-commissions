@@ -4,8 +4,7 @@ from odoo import models, fields, api
 
 
 class ProductProduct(models.Model):
-    _name = "product.product"
-    _inherit = ["product.product", "pos.load.mixin"]
+    _inherit = "product.product"
 
     commission_rule_id = fields.Many2one(
         "pos.commission.rule",
@@ -30,14 +29,12 @@ class ProductProduct(models.Model):
     )
 
     @api.model
-    def _load_pos_data_fields(self, config_id):
-        fields = super(ProductProduct, self)._load_pos_data_fields(config_id)
-        if config_id:
-            config = self.env["pos.config"].browse(config_id)
-            if config.commission_enabled:
-                fields = fields + [
-                    "commission_rule_id",
-                    "commission_override_rate",
-                    "commission_override_type",
-                ]
+    def _load_pos_data_fields(self, config):
+        fields = super(ProductProduct, self)._load_pos_data_fields(config)
+        if config.commission_enabled:
+            fields = fields + [
+                "commission_rule_id",
+                "commission_override_rate",
+                "commission_override_type",
+            ]
         return fields

@@ -3,15 +3,6 @@
 from odoo import models, fields, api
 
 
-class PosSession(models.Model):
-    _inherit = "pos.session"
-
-    def _loader_params_hr_employee(self):
-        result = super(PosSession, self)._loader_params_hr_employee()
-        result["search_params"]["fields"] = ["id", "name", "work_email"]
-        return result
-
-
 class PosConfig(models.Model):
     _inherit = "pos.config"
 

@@ -4,8 +4,7 @@ from odoo import models, fields, api
 
 
 class PosOrderLine(models.Model):
-    _name = "pos.order.line"
-    _inherit = ["pos.order.line", "pos.load.mixin"]
+    _inherit = "pos.order.line"
 
     commission_employee_id = fields.Many2one(
         "hr.employee",
@@ -69,6 +68,6 @@ class PosOrderLine(models.Model):
             line.commission_amount = commission
 
     @api.model
-    def _load_pos_data_fields(self, config_id):
-        fields = super(PosOrderLine, self)._load_pos_data_fields(config_id)
+    def _load_pos_data_fields(self, config):
+        fields = super(PosOrderLine, self)._load_pos_data_fields(config)
         return fields + ["commission_employee_id", "commission_amount"]

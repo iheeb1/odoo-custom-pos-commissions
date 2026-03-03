@@ -4,8 +4,7 @@ from odoo import models, fields, api
 
 
 class HrEmployee(models.Model):
-    _name = "hr.employee"
-    _inherit = ["hr.employee", "pos.load.mixin"]
+    _inherit = "hr.employee"
 
     commission_enabled = fields.Boolean(
         string="Eligible for Commission",
@@ -53,10 +52,8 @@ class HrEmployee(models.Model):
                 )
             )
 
-    @api.model
-    def _load_pos_data_fields(self, config_id):
+    def _load_pos_data_fields(self, config):
         return ["id", "name", "work_email", "commission_enabled"]
 
-    @api.model
-    def _load_pos_data_domain(self, data, config_id):
-        return [("company_id", "in", [False, data.get("company_id")])]
+    def _load_pos_data_domain(self, data, config):
+        return [("company_id", "=", config.company_id.id)]

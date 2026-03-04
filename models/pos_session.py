@@ -8,6 +8,4 @@ class PosSession(models.Model):
 
     def _load_pos_data_models(self, config):
         result = super(PosSession, self)._load_pos_data_models(config)
-        if "hr.employee" not in result:
-            result.append("hr.employee")
         return result

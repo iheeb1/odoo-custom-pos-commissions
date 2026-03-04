@@ -51,9 +51,3 @@ class HrEmployee(models.Model):
                     "commission_amount"
                 )
             )
-
-    def _load_pos_data_fields(self, config):
-        return ["id", "name", "work_email", "commission_enabled"]
-
-    def _load_pos_data_domain(self, data, config):
-        return [("company_id", "=", config.company_id.id)]

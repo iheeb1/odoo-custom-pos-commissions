@@ -27,17 +27,13 @@ class PosOrderLine(models.Model):
         for line in self:
             commission = 0.0
 
-            if not line.order_id.config_id.commission_enabled:
-                line.commission_amount = commission
-                continue
-
             employee = (
                 line.commission_employee_id
                 or line.order_id.employee_id
                 or line.order_id.user_id.employee_id
             )
 
-            if not employee or not employee.commission_enabled:
+            if not employee:
                 line.commission_amount = commission
                 continue
 
@@ -70,4 +66,4 @@ class PosOrderLine(models.Model):
     @api.model
     def _load_pos_data_fields(self, config):
         fields = super(PosOrderLine, self)._load_pos_data_fields(config)
-        return fields + ["commission_employee_id", "commission_amount"]
+        return fields + ["commission_employee_id"]

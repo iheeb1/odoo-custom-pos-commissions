@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates id="template" xml:space="preserve">
 
-    <t t-name="pos_sales_commission.CommissionWorkerPopup" owl="1">
-        <Dialog title="'Select Commission Workers'" footer="false" size="'lg'">
+    <t t-name="pos_sales_commission.CommissionWorkerPopup">
+        <Dialog size="'lg'">
+            <t t-set-slot="header">
+                <h4 class="modal-title">Select Commission Workers</h4>
+            </t>
             <div class="commission-worker-popup p-3">
                 <div class="alert alert-info mb-3">
                     <i class="fa fa-info-circle me-2"/>
@@ -37,17 +40,15 @@
                     </t>
                 </div>
                 
-                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                    <button class="btn btn-secondary px-4" t-on-click="onCancel">
-                        <i class="fa fa-times me-2"/>
-                        Cancel
-                    </button>
-                    <button class="btn btn-primary px-4" t-on-click="onConfirm">
-                        <i class="fa fa-check me-2"/>
-                        Confirm
-                    </button>
-                </div>
             </div>
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary btn-lg" t-on-click="onCancel">
+                    <i class="fa fa-times me-2"/>Cancel
+                </button>
+                <button class="btn btn-primary btn-lg" t-on-click="onConfirm">
+                    <i class="fa fa-check me-2"/>Confirm
+                </button>
+            </t>
         </Dialog>
     </t>
 

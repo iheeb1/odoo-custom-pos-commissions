@@ -72,8 +72,4 @@ class PosConfig(models.Model):
                     limit=1,
                 )
 
-    @api.model
-    def _load_pos_data_fields(self, config):
-        fields = super()._load_pos_data_fields(config)
-        fields.append("commission_enabled")
-        return fields
+

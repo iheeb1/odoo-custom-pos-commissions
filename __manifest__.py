@@ -30,7 +30,6 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "data/sequence.xml",
-        "data/assets.xml",
         "views/pos_commission_rule_views.xml",
         "wizards/pos_commission_pay_wizard_views.xml",
         "views/pos_commission_line_views.xml",

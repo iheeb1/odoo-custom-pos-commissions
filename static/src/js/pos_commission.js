@@ -22,7 +22,7 @@ export class CommissionWorkerPopup extends Component {
             initialAssignments[line.uuid] = line.commission_employee_id?.id || null;
         }
         this.state = useState({
-            lineEmployees: initialAssignments
+            lineEmployees: initialAssignments,
         });
     }
 
@@ -45,47 +45,56 @@ export class CommissionWorkerPopup extends Component {
 
 patch(OrderPaymentValidation.prototype, {
     async askBeforeValidation() {
+        console.log("[COMMISSION] askBeforeValidation START");
         const result = await super.askBeforeValidation(...arguments);
-        
+
         if (result === false) {
+            console.log("[COMMISSION] super returned false, aborting");
             return false;
         }
-        
-        if (!this.pos.config.commission_enabled) {
-            return true;
-        }
-        
+
         const order = this.order;
-        
+        console.log("[COMMISSION] order:", order);
         if (!order || !order.lines || order.lines.length === 0) {
+            console.log("[COMMISSION] no order or no lines, skipping");
             return true;
         }
-        
-        const employees = this.pos.models["hr.employee"].getAll();
-        
+        console.log("[COMMISSION] order lines count:", order.lines.length);
+
+        const employeeModel = this.pos.models["hr.employee"];
+        console.log("[COMMISSION] employeeModel:", employeeModel);
+        if (!employeeModel) {
+            console.log("[COMMISSION] no hr.employee model, skipping");
+            return true;
+        }
+
+        const employees = employeeModel.getAll();
+        console.log("[COMMISSION] employees:", employees, "count:", employees?.length);
         if (!employees || employees.length === 0) {
+            console.log("[COMMISSION] no employees, skipping");
             return true;
         }
-        
+
+        console.log("[COMMISSION] about to show popup");
         const popupResult = await makeAwaitable(this.pos.dialog, CommissionWorkerPopup, {
             order: order,
             employees: employees,
         });
-        
+
         if (popupResult === null || popupResult === undefined) {
             return false;
         }
-        
+
         for (const line of order.lines) {
             const employeeId = popupResult[line.uuid];
             if (employeeId) {
-                const employee = this.pos.models["hr.employee"].get(employeeId);
+                const employee = employeeModel.get(employeeId);
                 if (employee) {
                     line.commission_employee_id = employee;
                 }
             }
         }
-        
+
         return true;
     },
 });

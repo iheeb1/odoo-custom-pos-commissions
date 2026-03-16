@@ -9,37 +9,35 @@
             <div class="commission-worker-popup p-3">
                 <div class="alert alert-info mb-3">
                     <i class="fa fa-info-circle me-2"/>
-                    Select the worker for each order line who will receive the commission.
+                    Select the worker who will receive the commission for this order.
                 </div>
-                
-                <div class="orderlines-container mb-3">
-                    <t t-foreach="props.order.lines" t-as="line" t-key="line.uuid">
-                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 border rounded bg-light">
-                            <div class="d-flex flex-column flex-grow-1 me-3">
-                                <strong t-esc="line.product_id.name" class="text-dark"/>
-                                <small class="text-muted">
-                                    Qty: <t t-esc="line.qty"/> | 
-                                    <t t-esc="env.utils.formatCurrency(line.price_subtotal)"/>
-                                </small>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Commission Worker</label>
+                    <select class="form-select" t-on-change="onSelectEmployee">
+                        <option value="" t-att-selected="state.selectedEmployee === null">
+                            Session Cashier (default)
+                        </option>
+                        <t t-foreach="props.employees" t-as="emp" t-key="emp.id">
+                            <option t-att-value="emp.id"
+                                    t-att-selected="state.selectedEmployee === emp.id">
+                                <t t-esc="emp.name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+
+                <div class="order-summary mt-3">
+                    <h6>Order Lines</h6>
+                    <div class="list-group">
+                        <t t-foreach="props.order.lines" t-as="line" t-key="line.uuid">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span t-esc="line.product_id.name"/>
+                                <span class="badge bg-secondary">Qty: <t t-esc="line.qty"/></span>
                             </div>
-                            
-                            <select class="form-select w-auto" 
-                                    t-att-data-line-uuid="line.uuid"
-                                    t-on-change="onSelectEmployee">
-                                <option value="" t-att-selected="state.lineEmployees[line.uuid] === null">
-                                    Session Cashier (default)
-                                </option>
-                                <t t-foreach="props.employees" t-as="emp" t-key="emp.id">
-                                    <option t-att-value="emp.id"
-                                            t-att-selected="state.lineEmployees[line.uuid] === emp.id">
-                                        <t t-esc="emp.name"/>
-                                    </option>
-                                </t>
-                            </select>
-                        </div>
-                    </t>
+                        </t>
+                    </div>
                 </div>
-                
             </div>
             <t t-set-slot="footer">
                 <button class="btn btn-secondary btn-lg" t-on-click="onCancel">
@@ -50,6 +48,17 @@
                 </button>
             </t>
         </Dialog>
+    </t>
+
+    <!-- Add commission employee to receipt -->
+    <t t-name="pos_sales_commission.OrderReceiptCommission" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('pos-receipt')]" position="inside">
+            <t t-if="commissionWorkerName">
+                <div style="text-align:center; margin-top:4px;">
+                    <span style="font-weight:bold;">Employee: </span><t t-esc="commissionWorkerName"/>
+                </div>
+            </t>
+        </xpath>
     </t>
 
 </templates>

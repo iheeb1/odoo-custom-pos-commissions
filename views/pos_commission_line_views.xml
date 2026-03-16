@@ -112,6 +112,26 @@ records.filtered(lambda r: r.state == 'posted').action_cancel()
             </field>
         </record>
 
+        <record id="action_pay_commissions" model="ir.actions.server">
+            <field name="name">Pay Selected Commissions</field>
+            <field name="model_id" ref="model_pos_commission_line"/>
+            <field name="binding_model_id" ref="model_pos_commission_line"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+posted = records.filtered(lambda r: r.state == 'posted')
+if posted:
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'Pay Commissions',
+        'res_model': 'pos.commission.pay.wizard',
+        'view_mode': 'form',
+        'target': 'new',
+        'context': {'active_ids': posted.ids},
+    }
+            </field>
+        </record>
+
         <record id="action_pos_commission_line" model="ir.actions.act_window">
             <field name="name">Commission Lines</field>
             <field name="type">ir.actions.act_window</field>

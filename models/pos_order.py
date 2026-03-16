@@ -6,6 +6,12 @@ from odoo import models, fields, api
 class PosOrder(models.Model):
     _inherit = "pos.order"
 
+    @api.model
+    def _load_pos_data_fields(self, config):
+        fields = super()._load_pos_data_fields(config)
+        fields_to_exclude = {'commission_line_ids', 'commission_total', 'commission_move_id'}
+        return [f for f in fields if f not in fields_to_exclude]
+
     employee_id = fields.Many2one(
         "hr.employee",
         string="Worker/Employee",

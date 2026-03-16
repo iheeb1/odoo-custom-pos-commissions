@@ -78,6 +78,7 @@ class PosCommissionPayWizard(models.TransientModel):
             employees_totals[line.employee_id] += line.commission_amount
 
         move_lines = []
+        total_paid = 0.0
         for employee, total in employees_totals.items():
             if total <= 0:
                 continue
@@ -95,6 +96,7 @@ class PosCommissionPayWizard(models.TransientModel):
                     _("No liability account configured for employee %s") % employee.name
                 )
 
+            total_paid += total
             move_lines.append(
                 (
                     0,
@@ -102,8 +104,8 @@ class PosCommissionPayWizard(models.TransientModel):
                     {
                         "name": _("Commission Payment: %s") % employee.name,
                         "account_id": liability_account.id,
-                        "debit": 0.0,
-                        "credit": total,
+                        "debit": total,
+                        "credit": 0.0,
                         "partner_id": employee.user_id.partner_id.id
                         if employee.user_id
                         else False,
@@ -114,10 +116,7 @@ class PosCommissionPayWizard(models.TransientModel):
         if not move_lines:
             raise UserError(_("No valid commission lines to pay."))
 
-        payment_account = (
-            self.journal_id.payment_credit_account_id
-            or self.journal_id.default_account_id
-        )
+        payment_account = self.journal_id.default_account_id
         if not payment_account:
             raise UserError(
                 _("No payment account configured for the selected journal.")
@@ -131,8 +130,8 @@ class PosCommissionPayWizard(models.TransientModel):
                 {
                     "name": _("Commission Payments"),
                     "account_id": payment_account.id,
-                    "debit": self.total_amount,
-                    "credit": 0.0,
+                    "debit": 0.0,
+                    "credit": total_paid,
                 },
             ),
         )

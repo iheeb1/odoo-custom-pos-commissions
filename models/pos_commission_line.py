@@ -62,10 +62,10 @@ class PosCommissionLine(models.Model):
 
     commission_type = fields.Selection(
         [
-            ("percentage", "Percent"),
-            ("fixed_per_piece", "Per Item"),
-            ("fixed_per_order", "Per Order"),
-            ("fixed_after_threshold", "Tiered"),
+            ("percentage", "Sales Percentage (نسبة من المبيعات)"),
+            ("fixed_per_piece", "Per Unit (لكل وحدة)"),
+            ("fixed_per_order", "Per Sale (لكل عملية بيع)"),
+            ("fixed_after_threshold", "Tiered by Quantity (تصاعدي بالكميات)"),
         ],
         string="Commission Type",
         required=True,
